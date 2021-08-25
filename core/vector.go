@@ -419,6 +419,7 @@ func (v *Vector) assocN(i int, val Object) *Vector {
 
 func assertInteger(obj Object) int {
 	var i int
+	fmt.Printf(">> %v", obj)
 	switch obj := obj.(type) {
 	case Int:
 		i = obj.I

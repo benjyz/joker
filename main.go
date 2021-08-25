@@ -108,7 +108,16 @@ func processFile(filename string, phase Phase) error {
 			fmt.Fprintln(Stderr, "Error: ", err)
 			return err
 		}
+
+		outfilename := "new"
+		outf, err := os.Open(outfilename)
+		if err != nil {
+			fmt.Fprintln(Stderr, "Error: ", err)
+			return err
+		}
+
 		reader = NewReader(bufio.NewReader(f), filename)
+		writer := NewWriter(bufio.NewWriter(outf), outfilename)
 		if phase == FORMAT && writeFlag {
 			var b bytes.Buffer
 			oldStdout := Stdout
@@ -122,6 +131,16 @@ func processFile(filename string, phase Phase) error {
 				}
 				f.WriteString(b.String())
 				f.Close()
+			}()
+
+			defer func() {
+				outf.Close()
+				outf, err := os.Create(outfilename)
+				if err != nil {
+					fmt.Fprintln(Stderr, "Error: ", err)
+				}
+				outf.WriteString(b.String())
+				outf.Close()
 			}()
 		}
 	}
